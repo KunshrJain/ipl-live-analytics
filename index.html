@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IPL Live Analytics Platform</title>
+<meta name="description" content="Real-time IPL match analytics: win probability, partnerships, bowling efficiency, run rate and team comparison.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230ea5e9'/%3E%3Cpath d='M6 22l7-8 5 5 8-11' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="#live"><span class="logo"></span>IPL Live Analytics</a>
+  <nav id="nav">
+    <a href="#live">Live</a><a href="#analytics">Analytics</a><a href="#players">Players</a>
+    <a href="#compare">Compare</a><a href="#history">History</a><a href="#platform">Platform</a>
+  </nav>
+  <div class="tools">
+    <span id="status" class="pill" aria-live="polite">Connecting</span>
+    <label class="switch" title="Switch between demo simulation and the live backend">
+      <input type="checkbox" id="simSwitch" role="switch">
+      <span class="track"></span><span class="lbl" id="simLbl">Simulation</span>
+    </label>
+    <button class="btn ghost" id="notifyBtn" title="Match alerts">Alerts: off</button>
+    <button class="btn ghost" id="themeBtn" aria-label="Toggle theme">Theme</button>
+    <button class="btn" id="loginBtn">Sign in</button>
+  </div>
+</header>
+
+<div id="simBanner" class="banner" hidden>
+  Simulation mode: fictional teams and generated data for demonstration.
+  <span class="simctl">
+    Speed <select id="simSpeed"><option value="2500">Normal</option><option value="1000">Fast</option><option value="400">Turbo</option></select>
+    <button class="btn small" id="simRestart">Restart match</button>
+  </span>
+</div>
+
+<main>
+  <section id="live" class="page">
+    <div class="card hero" id="scoreboard"></div>
+    <div class="grid g3">
+      <div class="card span2"><h3>Win probability <small id="wpNote"></small></h3><div id="wpChart" class="chart"></div></div>
+      <div class="card"><h3>Current state</h3><div id="stateBox"></div></div>
+    </div>
+    <div class="grid g3">
+      <div class="card"><h3>At the crease</h3><div id="crease"></div></div>
+      <div class="card"><h3>Ball by ball</h3><div id="balls" class="balls"></div><div id="bowlerBox" class="muted"></div></div>
+      <div class="card"><h3>Match events</h3><ul id="events" class="events"></ul></div>
+    </div>
+  </section>
+
+  <section id="analytics" class="page" hidden>
+    <div class="grid g4" id="rrTiles"></div>
+    <div class="grid g2">
+      <div class="card"><h3>Runs per over</h3><div id="overChart" class="chart"></div><p class="legend"><i class="dot a"></i>Over <i class="dot w"></i>Wicket over</p></div>
+      <div class="card"><h3>Run progression vs required pace</h3><div id="wormChart" class="chart"></div><p class="legend"><i class="dot a"></i>Actual <i class="dot r"></i>Required pace</p></div>
+    </div>
+    <div class="grid g2">
+      <div class="card"><h3>Partnerships</h3><div id="partners"></div></div>
+      <div class="card"><h3>Bowling efficiency</h3><div id="bowlEff"></div></div>
+    </div>
+  </section>
+
+  <section id="players" class="page" hidden>
+    <div class="grid g2">
+      <div class="card"><h3>Batting</h3><div id="batCard" class="scroll"></div></div>
+      <div class="card"><h3>Bowling</h3><div id="bowlCard" class="scroll"></div></div>
+    </div>
+  </section>
+
+  <section id="compare" class="page" hidden>
+    <div class="card">
+      <h3>Team comparison</h3>
+      <div id="cmpHead" class="cmp-head"></div>
+      <div id="cmpBody"></div>
+    </div>
+  </section>
+
+  <section id="history" class="page" hidden>
+    <div class="card"><h3>Historical results</h3><div id="histBody" class="scroll"></div></div>
+  </section>
+
+  <section id="platform" class="page" hidden>
+    <div class="card">
+      <h3>Cloud architecture</h3>
+      <div class="arch">
+        <div class="node">Users</div><i>&rarr;</i>
+        <div class="node">Load Balancer</div><i>&rarr;</i>
+        <div class="node strong">EC2 Auto Scaling<br><small>API, analytics, auth, notifications</small></div><i>&rarr;</i>
+        <div class="node">Queue / Stream</div><i>&rarr;</i>
+        <div class="node">Database</div>
+      </div>
+      <div class="arch sub">
+        <div class="node">S3 bucket<br><small>static frontend, history</small></div>
+        <div class="node">Ingestion service<br><small>match data source</small></div>
+        <div class="node">Monitoring<br><small>metrics, alarms, logs</small></div>
+      </div>
+    </div>
+    <div class="grid g2">
+      <div class="card">
+        <h3>Backend connection</h3>
+        <dl class="kv" id="cfgBox"></dl>
+        <button class="btn" id="healthBtn">Run health check</button>
+        <p id="healthOut" class="muted"></p>
+      </div>
+      <div class="card">
+        <h3>Sustainable Development Goals</h3>
+        <ul class="sdg">
+          <li><b>SDG 9</b> Industry, Innovation and Infrastructure</li>
+          <li><b>SDG 8</b> Decent Work and Economic Growth</li>
+          <li><b>SDG 4</b> Quality Education</li>
+          <li><b>SDG 17</b> Partnerships for the Goals</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  This output is for internal reference only. Please review and verify all information before use. This does not constitute financial, legal, or investment advice.
+  Win probability and run rate projections are indicative model outputs based on assumptions that may not materialise.
+</footer>
+
+<div id="toasts" aria-live="polite"></div>
+
+<dialog id="loginDlg">
+  <form method="dialog" id="loginForm">
+    <h3>Sign in</h3>
+    <label>Username<input id="lgUser" autocomplete="username" required></label>
+    <label>Password<input id="lgPass" type="password" autocomplete="current-password"></label>
+    <p id="lgErr" class="muted"></p>
+    <div class="row"><button class="btn ghost" value="cancel" formnovalidate>Cancel</button><button class="btn" id="lgGo" value="ok">Sign in</button></div>
+  </form>
+</dialog>
+
+<script src="js/config.js"></script>
+<script src="js/mock.js"></script>
+<script src="js/api.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
