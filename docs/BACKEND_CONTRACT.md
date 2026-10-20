@@ -1,6 +1,6 @@
 # Backend Contract
 
-The frontend is static. It talks to the backend only through `js/api.js`. Set `API_BASE_URL` (and optionally `WS_URL`) in `js/config.js`.
+The frontend is a React build (static files). It talks to the backend only through `src/api/api.js`. Set `API_BASE_URL` (and optionally `WS_URL`) in `public/config.js` (`config.js` at the deployed root).
 
 ## Routing (ALB)
 - `/` and static assets: S3 bucket (or EC2 nginx).
@@ -23,7 +23,7 @@ The frontend is static. It talks to the backend only through `js/api.js`. Set `A
 Connect to `WS_URL + "/" + matchId`. Each message is either a snapshot or `{type:"snapshot", payload:<snapshot>}`. Without `WS_URL` the client polls `/state` every `POLL_INTERVAL_MS`.
 
 ## Snapshot shape
-See `snapshot()` in `js/mock.js` for a complete working example. Required keys:
+See `snapshot()` in `src/api/mock.js` for a complete working example. Required keys:
 
 ```
 source, updatedAt,
@@ -49,4 +49,4 @@ The UI currently renders the second innings (chase). Extending to first innings 
 The ingestion service may obtain match data by web scraping. Confirm the source's terms of use and robots policy before scraping. Keep scraping entirely in the backend; the frontend never calls third-party sites. Set `LIVE_SOURCE_LABEL` in `config.js` to name the source in the UI.
 
 ## Demo mode
-The header switch toggles Simulation and Live. Simulation uses `js/mock.js` (fictional data, no network). The choice persists in `localStorage` (`ipl.mode`); `DEFAULT_MODE` in `config.js` sets the initial value.
+The header switch toggles Simulation and Live. Simulation uses `src/api/mock.js` (fictional data, no network). The choice persists in `localStorage` (`ipl.mode`); `DEFAULT_MODE` in `config.js` sets the initial value.

@@ -1,29 +1,32 @@
 # IPL Live Analytics Platform: Frontend
 
-Static, dependency-free frontend (HTML, CSS, vanilla JS). No build step.
+React 18 + Vite single page app. Builds to static files for S3 or EC2/nginx.
 
 ## Run locally
 ```
-python3 -m http.server 8080
+npm install
+npm run dev        # http://localhost:5173
+npm run build      # outputs dist/
 ```
-Open http://localhost:8080. It starts in Simulation mode.
+Starts in Simulation mode (fictional data, no backend needed).
 
 ## Structure
-- `index.html`: single page app (hash routes: live, analytics, players, compare, history, platform).
-- `js/config.js`: all backend settings. Edit this first.
-- `js/api.js`: data layer (live HTTP/WebSocket or simulation).
-- `js/mock.js`: simulation engine (fictional data).
-- `js/charts.js`, `js/app.js`, `css/styles.css`.
-- `health.json`: static health check target.
+- `public/config.js`: all backend settings. Copied as-is into `dist/`, so it can be edited in the deployed bucket without rebuilding.
+- `src/api/api.js`: data layer (live HTTP/WebSocket or simulation).
+- `src/api/mock.js`: simulation engine.
+- `src/hooks.js`: `useSnapshot`, `useHashRoute`, `usePersisted`.
+- `src/components/`: header, login dialog, SVG charts, shared UI.
+- `src/pages/`: Live, Analytics, Players, Compare, History, Platform.
+- `public/health.json`: static health check target.
 - `docs/BACKEND_CONTRACT.md`: endpoints and snapshot schema.
 - `deploy/`: S3 sync script and nginx config for EC2.
 
 ## Connect to AWS
-1. Implement endpoints in `docs/BACKEND_CONTRACT.md` on EC2.
-2. Set ALB rules: `/api/*` to EC2, everything else to S3 or nginx.
-3. Set `DEFAULT_MODE: 'live'` in `js/config.js` (and `API_BASE_URL` / `WS_URL` if needed).
-4. Upload: `deploy/sync-s3.sh <bucket>`.
+1. Implement the endpoints in `docs/BACKEND_CONTRACT.md` on EC2.
+2. ALB rules: `/api/*` to EC2, everything else to S3 or nginx.
+3. Set `DEFAULT_MODE: 'live'` in `public/config.js` (and `API_BASE_URL` / `WS_URL` if needed).
+4. Deploy: `deploy/sync-s3.sh <bucket>` (builds, then syncs `dist/`).
 
-Users can also flip Simulation / Live from the header switch.
+The header switch flips Simulation / Live at runtime.
 
 This output is for internal reference only. Please review and verify all information before use. This does not constitute financial, legal, or investment advice.
